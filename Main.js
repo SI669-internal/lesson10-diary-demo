@@ -2,6 +2,18 @@ import React from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { Button } from 'react-native-elements';
 import { styles } from './Styles';
+import firebase from 'firebase';
+import '@firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyASbJPUAfjRZRtc5qpvsRhs609f8o-B9jc",
+  authDomain: "lesson10-diary.firebaseapp.com",
+  databaseURL: "https://lesson10-diary.firebaseio.com",
+  projectId: "lesson10-diary",
+  storageBucket: "lesson10-diary.appspot.com",
+  messagingSenderId: "719297828921",
+  appId: "1:719297828921:web:3ef7d4908643806e7255e8"
+};
 
 export class MainScreen extends React.Component {
 
@@ -24,12 +36,32 @@ export class MainScreen extends React.Component {
     this.state = {
       entries: theList,
     }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    this.entriesRef = db.collection('entries'); 
+    this.entriesRef.get().then(queryRef=>{
+      let newEntries = [];
+      queryRef.forEach(docRef=>{
+        let docData = docRef.data();
+        let newEntry = {
+          text: data.text,
+          timestamp: data.timestamp.toDate(),
+          key: docRef.id
+        }
+        newEntries.push(newEntry);
+      })
+      this.setState({entries: newEntries});
+    });
   }
 
   addEntry(newEntry) {
-    let newEntries = this.state.entries.slice(); // clone the list
-    newEntries.push(newEntry);
-    this.setState({entries: newEntries});
+    // add to Firebase
+    this.entriesRef.add(newEntry).then(docRef=> {
+      newEntry.key = docRef.id;
+      let newEntries = this.state.entries.slice(); // clone the list
+      newEntries.push(newEntry);
+      this.setState({entries: newEntries});
+    })
   }
 
   render() {
@@ -54,6 +86,7 @@ export class MainScreen extends React.Component {
                         title='Delete'
                         containerStyle={styles.mediumButtonContainer}
                         titleStyle={styles.mediumButtonTitle}
+                        onPress={()=>{this.handleDelete(item)}}
                       />
                       <Button
                         title='Edit'
