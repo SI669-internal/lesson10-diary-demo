@@ -44,8 +44,8 @@ export class MainScreen extends React.Component {
       queryRef.forEach(docRef=>{
         let docData = docRef.data();
         let newEntry = {
-          text: data.text,
-          timestamp: data.timestamp.toDate(),
+          text: docData.text,
+          timestamp: docData.timestamp.toDate(),
           key: docRef.id
         }
         newEntries.push(newEntry);
@@ -62,6 +62,23 @@ export class MainScreen extends React.Component {
       newEntries.push(newEntry);
       this.setState({entries: newEntries});
     })
+  }
+
+  handleDelete(entryToDelete) {
+    this.deleteEntry(entryToDelete);
+  }
+
+  deleteEntry(entryToDelete) {
+    let entryKey = entryToDelete.key;
+    this.entriesRef.doc(entryKey).delete().then(()=> {
+      let newEntries = [];
+      for (entry of this.state.entries) {
+        if (entry.key !== entryKey) {
+          newEntries.push(entry);
+        }
+      }
+      this.setState({entries: newEntries});
+    });
   }
 
   render() {
