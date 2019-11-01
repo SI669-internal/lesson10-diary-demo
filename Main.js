@@ -26,6 +26,12 @@ export class MainScreen extends React.Component {
     }
   }
 
+  addEntry(newEntry) {
+    let newEntries = this.state.entries.slice(); // clone the list
+    newEntries.push(newEntry);
+    this.setState({entries: newEntries});
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -65,7 +71,7 @@ export class MainScreen extends React.Component {
           <Button
             title='Add Entry'
             onPress={() => {
-              this.props.navigation.navigate('Details');
+              this.props.navigation.navigate('Details', {mainScreen: this});
             }}
           />
         </View>

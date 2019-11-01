@@ -7,6 +7,19 @@ export class EntryDetailScreen extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state= {
+      inputText: ''
+    }
+  }
+
+  handleSave = () => {
+    let newEntry = {
+      text: this.state.inputText,
+      timestamp: new Date(Date.now())
+    }
+    let mainScreen = this.props.navigation.getParam('mainScreen');
+    mainScreen.addEntry(newEntry);
+    this.props.navigation.goBack();
   }
 
   render() {
@@ -21,6 +34,8 @@ export class EntryDetailScreen extends React.Component {
             placeholder="What's new?"
             inputContainerStyle={styles.largeInput}
             containerStyle={{justifyContent: 'flex-start'}}
+            value={this.state.inputText}
+            onChangeText={(value)=>{this.setState({inputText: value})}}
           />
         </View>
         <View style={styles.footerContainer}>
@@ -34,9 +49,7 @@ export class EntryDetailScreen extends React.Component {
           <Button
             title='Save'
             containerStyle={styles.mediumButtonContainer}
-            onPress={() => {
-              this.props.navigation.goBack();
-            }}
+            onPress={this.handleSave}
           />
         </View>
       </View>
