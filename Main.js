@@ -19,9 +19,12 @@ export class MainScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    let now = new Date(Date.now());
-    console.log(now.toLocaleString());
     let theList = [];
+    this.labels = [
+      {key: 'h', name: 'Home'},
+      {key: 'w', name: 'Work'},
+      {key: 's', name: 'School'}
+    ];
     this.state = {
       entries: theList,
     }

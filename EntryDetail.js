@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { Button, Input } from 'react-native-elements';
+import { View, Text, FlatList } from 'react-native';
+import { Button, Input, CheckBox } from 'react-native-elements';
 import { styles } from './Styles';
 
 export class EntryDetailScreen extends React.Component {
@@ -15,8 +15,16 @@ export class EntryDetailScreen extends React.Component {
       initText = this.entryToUpdate.text;
     }
 
+    this.mainScreen = this.props.navigation.getParam('mainScreen');
+
+    let initLabels = this.mainScreen.labels;
+    for (label of initLabels) {
+      label.value = true;
+    }
+
     this.state= {
-      inputText: initText
+      inputText: initText,
+      labels: initLabels
     }
   }
 
@@ -35,21 +43,52 @@ export class EntryDetailScreen extends React.Component {
     this.props.navigation.goBack();
   }
 
+  handleLabelToggle = (labelToToggle) => {
+    this.setState(prevState => {
+      let theLabels = prevState.labels.slice();
+      for (label of theLabels) {
+        if (label.key === labelToToggle.key) {
+          label.value = !label.value;
+        }
+      }
+      return {labels: theLabels};
+    });
+  }
+  
   render() {
     return (
       <View style={styles.container}>
           <View style={styles.headerContainer}>
             <Text style={styles.headerText}>Entry Details</Text>
           </View>
-        <View style={styles.bodyContainer}>
-          <Input
-            multiline={true}
-            placeholder="What's new?"
-            inputContainerStyle={styles.largeInput}
-            containerStyle={{justifyContent: 'flex-start'}}
-            value={this.state.inputText}
-            onChangeText={(value)=>{this.setState({inputText: value})}}
-          />
+        <View style={styles.detailsBodyContainer}>
+          <View style={styles.detailsInputContainer}>
+            <Input
+              multiline={true}
+              placeholder="What's new?"
+              inputContainerStyle={styles.largeInput}
+              containerStyle={{justifyContent: 'flex-start'}}
+              value={this.state.inputText}
+              onChangeText={(value)=>{this.setState({inputText: value})}}
+            />
+          </View>
+          <View style={styles.detailsLabelsContainer}>
+            <FlatList
+              data={this.state.labels}
+              renderItem={({item})=>{
+                return(
+                  <View style={styles.labelSelectContainer}>
+                    <CheckBox
+                      containerStyle={styles.labelSelectCheckBoxContainer}
+                      checked={item.value}
+                      onPress={()=>{this.handleLabelToggle(item)}}
+                    />
+                    <Text style={styles.labelSelectText}>{item.name}</Text>
+                  </View>
+                );
+              }}
+            />
+          </View>
         </View>
         <View style={styles.footerContainer}>
           <Button
