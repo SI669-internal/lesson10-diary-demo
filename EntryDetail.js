@@ -7,18 +7,31 @@ export class EntryDetailScreen extends React.Component {
 
   constructor(props) {
     super(props);
+    this.entryToUpdate = this.props.navigation.getParam('entry', undefined);
+    this.isAdd = (typeof this.entryToUpdate === 'undefined');
+    
+    let initText = '';
+    if (!this.isAdd) {
+      initText = this.entryToUpdate.text;
+    }
+
     this.state= {
-      inputText: ''
+      inputText: initText
     }
   }
 
   handleSave = () => {
     let newEntry = {
       text: this.state.inputText,
-      timestamp: new Date(Date.now())
-    }
+      timestamp: new Date(Date.now()),
+    };
     let mainScreen = this.props.navigation.getParam('mainScreen');
-    mainScreen.addEntry(newEntry);
+    if (this.isAdd) {
+      mainScreen.addEntry(newEntry);
+    } else {
+      newEntry.key = this.entryToUpdate.key;
+      mainScreen.updateEntry(newEntry);
+    }
     this.props.navigation.goBack();
   }
 

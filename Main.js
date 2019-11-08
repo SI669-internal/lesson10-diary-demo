@@ -21,18 +21,7 @@ export class MainScreen extends React.Component {
     super(props);
     let now = new Date(Date.now());
     console.log(now.toLocaleString());
-    let theList = [
-      {
-        text: 'Hello',
-        timestamp: now,
-        key: '1223',
-      },
-      { 
-        text: 'Goodbye',
-        timestamp: now,
-        key: '2244'
-      }
-    ];
+    let theList = [];
     this.state = {
       entries: theList,
     }
@@ -55,17 +44,12 @@ export class MainScreen extends React.Component {
   }
 
   addEntry(newEntry) {
-    // add to Firebase
     this.entriesRef.add(newEntry).then(docRef=> {
       newEntry.key = docRef.id;
       let newEntries = this.state.entries.slice(); // clone the list
       newEntries.push(newEntry);
       this.setState({entries: newEntries});
     })
-  }
-
-  handleDelete(entryToDelete) {
-    this.deleteEntry(entryToDelete);
   }
 
   deleteEntry(entryToDelete) {
@@ -78,6 +62,35 @@ export class MainScreen extends React.Component {
         }
       }
       this.setState({entries: newEntries});
+    });
+  }
+
+  updateEntry(entryToUpdate) {
+    //let entryKey = entryToUpdate.key;
+    this.entriesRef.doc(entryToUpdate.key).set({
+      text: entryToUpdate.text,
+      timestamp: entryToUpdate.timestamp
+    }).then(() => {
+      let newEntries = [];
+      for (entry of this.state.entries) {
+        if (entry.key === entryToUpdate.key) {
+          newEntries.push(entryToUpdate);
+        } else {
+          newEntries.push(entry);
+        }
+      }
+      this.setState({entries: newEntries});
+    });
+  }
+
+  handleDelete(entryToDelete) {
+    this.deleteEntry(entryToDelete);
+  }
+
+  handleEdit(entryToEdit) {
+    this.props.navigation.navigate('Details', {
+      entry: entryToEdit,
+      mainScreen: this
     });
   }
 
@@ -109,6 +122,7 @@ export class MainScreen extends React.Component {
                         title='Edit'
                         containerStyle={styles.mediumButtonContainer}
                         titleStyle={styles.mediumButtonTitle}
+                        onPress={()=>{this.handleEdit(item)}}
                       />
                     </View>
 
