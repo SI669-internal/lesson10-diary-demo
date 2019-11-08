@@ -7,22 +7,29 @@ export class EntryDetailScreen extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.entryToUpdate = this.props.navigation.getParam('entry', undefined);
+    this.mainScreen = this.props.navigation.getParam('mainScreen');
+
     this.isAdd = (typeof this.entryToUpdate === 'undefined');
     
     let initText = '';
+    let initLabels = [];
+
     if (!this.isAdd) {
       initText = this.entryToUpdate.text;
+      initLabels = this.entryToUpdate.labels;
+    } else {
+      for (lbl of this.mainScreen.labels) {
+        initLabels.push({
+          key: lbl.key,
+          name: lbl.name,
+          value: false
+        })
+      }
     }
 
-    this.mainScreen = this.props.navigation.getParam('mainScreen');
-
-    let initLabels = this.mainScreen.labels;
-    for (label of initLabels) {
-      label.value = true;
-    }
-
-    this.state= {
+    this.state = {
       inputText: initText,
       labels: initLabels
     }
@@ -32,6 +39,7 @@ export class EntryDetailScreen extends React.Component {
     let newEntry = {
       text: this.state.inputText,
       timestamp: new Date(Date.now()),
+      labels: this.state.labels
     };
     let mainScreen = this.props.navigation.getParam('mainScreen');
     if (this.isAdd) {
@@ -54,7 +62,7 @@ export class EntryDetailScreen extends React.Component {
       return {labels: theLabels};
     });
   }
-  
+
   render() {
     return (
       <View style={styles.container}>

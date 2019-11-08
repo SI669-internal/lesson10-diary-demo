@@ -38,7 +38,8 @@ export class MainScreen extends React.Component {
         let newEntry = {
           text: docData.text,
           timestamp: docData.timestamp.toDate(),
-          key: docRef.id
+          key: docRef.id, 
+          labels: docData.labels
         }
         newEntries.push(newEntry);
       })
@@ -72,7 +73,8 @@ export class MainScreen extends React.Component {
     //let entryKey = entryToUpdate.key;
     this.entriesRef.doc(entryToUpdate.key).set({
       text: entryToUpdate.text,
-      timestamp: entryToUpdate.timestamp
+      timestamp: entryToUpdate.timestamp,
+      labels: entryToUpdate.labels
     }).then(() => {
       let newEntries = [];
       for (entry of this.state.entries) {
